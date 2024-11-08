@@ -1,6 +1,6 @@
 # JAVACloudStorage
 
-> [!DANGER]
+> [!CAUTION]
 > 
 > 这不是一个完整的项目，只是用于完成课程作业
 > 
