@@ -1,5 +1,6 @@
 package fan.yangyi.javacloudstorage.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import fan.yangyi.javacloudstorage.mapper.FileMapMapper;
 import fan.yangyi.javacloudstorage.pojo.FileMap;
 import fan.yangyi.javacloudstorage.pojo.User;
@@ -22,4 +23,9 @@ public class FileMapService {
         return rootDir;
     }
 
+    public FileMap getRootDir(long loginIdAsLong) {
+        QueryWrapper<FileMap> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(FileMap::getOwner, loginIdAsLong).eq(FileMap::getIsRoot, 1);
+        return fileMapMapper.selectOne(queryWrapper);
+    }
 }

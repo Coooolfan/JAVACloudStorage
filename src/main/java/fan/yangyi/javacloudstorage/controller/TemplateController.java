@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class TemplateController {
 
-    @GetMapping("/")
+    @GetMapping("/login")
     public String login(Model model) {
         // 初始化User对象并传递到模板
         model.addAttribute("user", new User());
@@ -20,8 +20,4 @@ public class TemplateController {
         return "register";
     }
 
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "dashboard";
-    }
 }

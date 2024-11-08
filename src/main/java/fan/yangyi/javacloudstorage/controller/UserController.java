@@ -1,9 +1,11 @@
 package fan.yangyi.javacloudstorage.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import fan.yangyi.javacloudstorage.pojo.User;
 import fan.yangyi.javacloudstorage.service.UserService;
 import fan.yangyi.javacloudstorage.untils.BRUtils;
 import jakarta.validation.Valid;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,7 @@ public class UserController {
         // 执行登录操作
         User userLogined = userService.login(user);
         if (userLogined != null) {
-            return "dashboard";
+            return "redirector";
         }
 
         // 登录失败
@@ -52,6 +54,15 @@ public class UserController {
         if (userRegistered != null) {
             return new ResponseEntity<>(userRegistered, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("用户名重复",HttpStatus.BAD_REQUEST);
+    }
+
+    @GetMapping(value = "/info")
+    public ResponseEntity<User> getUserInfo() {
+        if(StpUtil.isLogin()){
+            val loginId = StpUtil.getLoginIdAsLong();
+            return ResponseEntity.ok(userService.getUserInfo(loginId));
+        }
+        return new ResponseEntity(null,HttpStatus.UNAUTHORIZED);
     }
 }

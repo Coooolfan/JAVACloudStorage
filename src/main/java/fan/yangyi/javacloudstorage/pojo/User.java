@@ -23,4 +23,6 @@ public class User {
             message = "密码长度至少6个字符，至少包含一个特殊字符和数字"
     )
     private String password;
+
+    private String avatar;
 }
