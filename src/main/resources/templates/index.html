@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Home</title>
+</head>
+<body>
+<div id="page" class="site">
+    <div class="container">
+        <div class="login">
+            <div class="hero">
+                <h1>JAVA Cloud Stroage</h1>
+                <h2>欢迎回来</h2>
+                <p>第一次访问？<br/>可以<a href="/register">点击这里</a>进行注册.</p>
+            </div>
+            <div class="main">
+                <form action="#" th:action="@{/api/user/token}" th:object="${user}" method="post">
+                    <p>
+                        <input type="text" th:field="*{username}" placeholder="用户名"/>
+                    </p>
+                    <p class="password">
+                        <input type="password" th:field="*{password}" placeholder="密码"/>
+                    </p>
+                    <p>
+                        <input type="submit" class="submit" value="登录"/>
+                    </p>
+
+                    <!-- 显示表单验证错误 -->
+                    <div th:if="${#fields.hasErrors('username')}" class="error">
+                        <ul>
+                            <li th:each="error : ${#fields.errors('username')}" th:text="${error}"></li>
+                        </ul>
+                    </div>
+
+                    <div th:if="${#fields.hasErrors('password')}" class="error">
+                        <ul>
+                            <li th:each="error : ${#fields.errors('password')}" th:text="${error}"></li>
+                        </ul>
+                    </div>
+
+                    <!-- 如果有全局错误，显示 -->
+                    <div th:if="${errors != null}">
+                        <ul>
+                            <li th:each="error : ${errors}" th:text="${error.defaultMessage}"></li>
+                        </ul>
+                    </div>
+
+                    <!-- 登录失败错误 -->
+                    <div class="errmsg" th:if="${loginError != null}" th:text="${loginError}"></div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<style>
+    @font-face {
+        font-family: "Congenial Bold";
+        src: url("https://yangyi.fan/media/fonts/fonnts.com-Congenial_Bold.otf") format("opentype");
+        font-weight: bold;
+        font-style: normal;
+    }
+
+    :root {
+        --primary-color: #4460f1;
+        --white-color: #ffffff;
+
+        --light-text-color: #9398b3;
+        --light-bg-color: #f2f4ff;
+        --dark-color: #333333;
+
+        --background-color: #fcfcff;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    *,
+    ::before::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Noto Sans SC", sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.8;
+        color: var(--dark-color);
+        background-color: var(--background-color);
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    ul {
+        list-style: none;
+    }
+
+    h1 {
+        font-size: 3em;
+        font-weight: 700;
+        line-height: normal;
+        color: black;
+    }
+
+    .site {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .container {
+        max-width: 1000px;
+        width: 100%;
+        padding: 0 30px;
+        margin: 0 auto;
+    }
+
+    .login {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .hero {
+        flex: 1 0 66.6666%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        padding: 70px 0;
+    }
+
+    /* 选中hero的第一个子元素 */
+    .hero h1:first-child {
+        /* 从网络加载字体 */
+        font-family: "Congenial Bold", sans-serif;
+        font-size: 2.5em;
+        font-weight: 700;
+        line-height: normal;
+    }
+
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: 15%;
+        left: 0;
+        width: 280px;
+        height: 100px;
+        background: linear-gradient(
+                to right,
+                var(--primary-color),
+                #c471ed,
+                #f64f59
+        );
+        z-index: -1;
+        filter: blur(100px);
+    }
+
+    .hero a {
+        font-weight: 500;
+        color: var(--primary-color);
+        transition: color 0.3s;
+    }
+
+    .hero a:hover,
+    form .password a:hover {
+        color: var(--dark-color);
+        text-decoration: underline;
+    }
+
+    .main {
+        padding-top: 50px;
+        flex: 1 0 33.3333%;
+    }
+
+    .main form {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .main form p {
+        position: relative;
+    }
+
+    form input {
+        font: inherit;
+        font-size: 14px;
+        width: 100%;
+        border: 0;
+        outline: 0;
+        padding: 0 20px;
+        line-height: 60px;
+        border-radius: 10px;
+        /*修复input 加入padding之后大小变化的问题*/
+        box-sizing: border-box;
+    }
+
+    input::placeholder {
+        color: var(--dark-color);
+        font-family: "Noto Sans SC", sans-serif;
+        font-size: inherit;
+    }
+
+    form input:not(.submit) {
+        background-color: var(--light-bg-color);
+    }
+
+    form .password i {
+        position: absolute;
+        top: calc(60px / 2);
+        right: 20px;
+        margin-top: -8px;
+        line-height: 1;
+        color: var(--light-text-color);
+        cursor: pointer;
+    }
+
+    form .password a {
+        font-size: 13px;
+        color: var(--light-text-color);
+        float: right;
+        margin: 5px 20px 0 0;
+    }
+
+    form input.submit {
+        font-weight: 700;
+        color: var(--white-color);
+        background-color: var(--primary-color);
+        box-shadow: var(--primary-color) 0 20px 30px -10px;
+        cursor: pointer;
+        transition: box-shadow 0.3s;
+    }
+
+    form input.submit:hover {
+        box-shadow: var(--primary-color) 0 10px 30px -10px;
+    }
+
+    .errmsg {
+        color: red;
+    }
+</style>

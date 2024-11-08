@@ -7,16 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FIleMapService {
+public class FileMapService {
 
     private final FileMapMapper fileMapMapper;
 
     @Autowired
-    public FIleMapService(FileMapMapper fileMapMapper) {
+    public FileMapService(FileMapMapper fileMapMapper) {
         this.fileMapMapper = fileMapMapper;
     }
 
-    public FileMap createRootDir(User user){
+    public FileMap createRootDir(User user) {
         FileMap rootDir = new FileMap("root", "", true, 0, user.getId(), true, 0);
         fileMapMapper.insert(rootDir);
         return rootDir;
