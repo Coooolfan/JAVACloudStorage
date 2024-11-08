@@ -10,15 +10,17 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserMapper userMapper;
+    private final FIleMapService fileMapService;
 
     @Autowired
-    public UserService(UserMapper userMapper) {
+    public UserService(UserMapper userMapper, FIleMapService fileMapService) {
         this.userMapper = userMapper;
+        this.fileMapService = fileMapService;
     }
 
 
     public User register(String username, String password) {
-        if(username == null || password == null) {
+        if (username == null || password == null) {
             return null;
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -27,10 +29,10 @@ public class UserService {
         if (existUser != null) {
             return null;
         }
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
+        User user = new User(null, username, password);
         userMapper.insert(user);
+        // 为这个用户创建一个Root文件夹
+        fileMapService.createRootDir(user);
         return user;
     }
 

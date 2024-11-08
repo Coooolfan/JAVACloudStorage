@@ -1,5 +1,7 @@
 package fan.yangyi.javacloudstorage.pojo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +13,8 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+    @TableId(type = IdType.AUTO)
+    private Integer id;
     @Length(min = 6, message = "用户名长度不得小于6")
     private String username;
     //  长度至少6个字符，至少包含一个特殊字符和数字
