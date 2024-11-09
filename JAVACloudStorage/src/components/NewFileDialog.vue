@@ -20,6 +20,17 @@ const dialogRef: any = inject("dialogRef");
 
 async function uploadHandler() {
   const resp = await postNewFile(newFile.value, dialogRef.value.data.dirId);
+  if (resp === "linked") {
+    toast.add({
+      severity: "success",
+      summary: "上传完成",
+      detail: `秒传成功, 刷新页面可见`,
+      life: 3000,
+    });
+    // 刷新页面
+    closeDialog();
+    return;
+  }
   if (resp === "success") {
     toast.add({
       severity: "success",
@@ -28,7 +39,7 @@ async function uploadHandler() {
       life: 3000,
     });
     // 刷新页面
-    window.location.reload();
+    closeDialog();
     return;
   }
   toast.add({

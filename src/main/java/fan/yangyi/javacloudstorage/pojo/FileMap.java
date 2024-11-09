@@ -35,11 +35,14 @@ public class FileMap {
 
     private String filePath;
 
+    private  String sha256;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
 
-    public FileMap(String filename, String format, Boolean isDirectory, Integer parent, Integer owner, Boolean isRoot, Integer size) {
+
+    public FileMap(String filename, String format, Boolean isDirectory, Integer parent, Integer owner, Boolean isRoot, Integer size, String sha256) {
         this.filename = filename;
         this.format = format;
         this.isDirectory = isDirectory;
@@ -48,6 +51,7 @@ public class FileMap {
         this.isRoot = isRoot;
         this.filePath = generateFilePath();
         this.size = size;
+        this.sha256 = sha256;
     }
 
     public static String generateFilePath() {

@@ -63,15 +63,31 @@ public class FileMapController {
         return ResponseEntity.ok(fileMapService.createDir(loginId, request.getDirName(), request.getParentId()));
     }
 
-//    上传
+    //    上传、秒传
+    @GetMapping("/file")
+    public ResponseEntity<FileMap> createFileBySHA(@RequestParam("filename") String filename,
+                                                   @RequestParam("format") String format,
+                                                   @RequestParam("parentId") Long  parentId,
+                                                   @RequestParam("sha256") String sha256
+    ) {
+        val loginId = StpUtil.getLoginIdAsLong();
+        FileMap fileBySHA = fileMapService.createFileBySHA(loginId, filename, format, parentId, sha256);
+        if (fileBySHA == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else
+            return ResponseEntity.ok(fileBySHA);
+    }
+
+    //    上传
     @PostMapping("/file")
     public ResponseEntity<FileMap> createFile(@RequestParam("filename") String filename,
                                               @RequestParam("format") String format,
                                               @RequestParam("parentId") Long parent,
-                                              @RequestParam("file") MultipartFile file
+                                              @RequestParam("file") MultipartFile file,
+                                              @RequestParam("sha256") String SHA256
     ) {
         val loginId = StpUtil.getLoginIdAsLong();
-        return ResponseEntity.ok(fileMapService.createFile(loginId, filename, format, parent, file));
+        return ResponseEntity.ok(fileMapService.createFile(loginId, filename, format, parent, file, SHA256));
     }
 
     @GetMapping("/file/{id}")

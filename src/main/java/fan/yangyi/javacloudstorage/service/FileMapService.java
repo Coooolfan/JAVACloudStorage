@@ -39,7 +39,7 @@ public class FileMapService {
     }
 
     public FileMap createRootDir(User user) {
-        FileMap rootDir = new FileMap("", "", true, 0, user.getId(), true, 0);
+        FileMap rootDir = new FileMap("", "", true, 0, user.getId(), true, 0, "");
         fileMapMapper.insert(rootDir);
         return rootDir;
     }
@@ -50,19 +50,23 @@ public class FileMapService {
         return fileMapMapper.selectOne(queryWrapper);
     }
 
-    public List<FileMap> getDirChildren(long userId, long fileId) {
-        if (fileId == -1) {
+    public List<FileMap> getDirChildren(long userId, long parentId) {
+        if (parentId == -1) {
             FileMap rootDir = getRootDir(userId);
-            fileId = rootDir.getId();
+            parentId = rootDir.getId();
         }
         QueryWrapper<FileMap> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(FileMap::getOwner, userId).eq(FileMap::getParent, fileId);
+        queryWrapper.lambda().eq(FileMap::getOwner, userId).eq(FileMap::getParent, parentId);
         return fileMapMapper.selectList(queryWrapper);
     }
 
-    public FileMap getFileDetail(long loginId, long fileId) {
+    public FileMap getFileDetail(long loginId, long parentId) {
+        if(parentId == -1) {
+            FileMap rootDir = getRootDir(loginId);
+            parentId = rootDir.getId();
+        }
         QueryWrapper<FileMap> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(FileMap::getId, fileId).eq(FileMap::getOwner, loginId);
+        queryWrapper.lambda().eq(FileMap::getId, parentId).eq(FileMap::getOwner, loginId);
         return fileMapMapper.selectOne(queryWrapper);
     }
 
@@ -89,12 +93,12 @@ public class FileMapService {
         if (fileMapMapper.selectOne(queryWrapper) != null) {
             return null;
         }
-        FileMap fileMap = new FileMap(dirName, "", true, parentId.intValue(), loginId.intValue(), false, 0);
+        FileMap fileMap = new FileMap(dirName, "", true, parentId.intValue(), loginId.intValue(), false, 0, "");
         fileMapMapper.insert(fileMap);
         return fileMap;
     }
 
-    public FileMap createFile(Long loginId, String filename, String format, Long parent, MultipartFile file) {
+    public FileMap createFile(Long loginId, String filename, String format, Long parent, MultipartFile file, String SHA256) {
         if (parent == -1) {
 //            获取根目录ID
             FileMap rootDir = getRootDir(loginId);
@@ -102,10 +106,10 @@ public class FileMapService {
         }
         Long size = file.getSize() / 1024;
         val user = userMapper.selectById(loginId);
-        if(user.getQuota()-user.getUsedQuota()-size<0){
+        if (user.getQuota() - user.getUsedQuota() - size < 0) {
             throw new UnderQuotaException("用户剩余空间不足");
         }
-        user.setUsedQuota(user.getUsedQuota()+size);
+        user.setUsedQuota(user.getUsedQuota() + size);
         QueryWrapper<FileMap> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .eq(FileMap::getOwner, loginId)
@@ -116,7 +120,7 @@ public class FileMapService {
             return null;
         }
 
-        FileMap fileMap = new FileMap(filename, format, false, parent.intValue(), loginId.intValue(), false, size.intValue());
+        FileMap fileMap = new FileMap(filename, format, false, parent.intValue(), loginId.intValue(), false, size.intValue(), SHA256);
         fileMapMapper.insert(fileMap);
         userMapper.updateById(user);
         val saveFiles = saveFiles(file, fileMap.getFilePath());
@@ -176,6 +180,9 @@ public class FileMapService {
         if (fileMap == null) {
             return false;
         }
+        val user = userMapper.selectById(loginId);
+        user.setUsedQuota(user.getUsedQuota() - fileMap.getSize());
+        userMapper.updateById(user);
         fileMapMapper.deleteById(id);
         return true;
     }
@@ -190,5 +197,28 @@ public class FileMapService {
         fileMap.setFilename(newFilename);
         fileMapMapper.updateById(fileMap);
         return fileMap;
+    }
+
+    public FileMap createFileBySHA(Long loginId, String filename, String format, Long parent, String sha256) {
+        if(parent == -1) {
+            FileMap rootDir = getRootDir(loginId);
+            parent = Long.valueOf(rootDir.getId());
+        }
+        if (sha256.length() < 63) return null;
+        QueryWrapper<FileMap> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(FileMap::getSha256, sha256);
+        val fileMaps = fileMapMapper.selectList(queryWrapper);
+
+        if (fileMaps.isEmpty()) return null;
+
+        FileMap fileMap = fileMaps.getFirst();
+        FileMap newFilemap = new FileMap(filename, format, false, parent.intValue(), loginId.intValue(),
+                false, fileMap.getSize(), sha256);
+        newFilemap.setFilePath(fileMap.getFilePath());
+        fileMapMapper.insert(newFilemap);
+        val user = userMapper.selectById(loginId);
+        user.setUsedQuota(user.getUsedQuota() + fileMap.getSize());
+        userMapper.updateById(user);
+        return newFilemap;
     }
 }

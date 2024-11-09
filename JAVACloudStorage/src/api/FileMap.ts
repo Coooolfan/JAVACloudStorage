@@ -51,31 +51,39 @@ async function postFolder(name: string, parent: number) {
 }
 
 async function postNewFile(newFile: any, parentId: number): Promise<string> {
+  newFile.processing = "读取中……";
+  const sha256 = await calculateFileSHA256(newFile.file);
+
   try {
-    const formData = new FormData();
-    formData.append("filename", newFile.file_name);
-    formData.append("format", newFile.format);
-    formData.append("file", newFile.file);
-    formData.append("parentId", parentId.toString());
-    const response = await axiosInstance.post("filemap/file", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      // 回调，用于更新上传进度
-      onUploadProgress: function (progressEvent) {
-        let percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total!
-        );
-        newFile.processing = percentCompleted;
-      },
-    });
-    return "success";
+    await axiosInstance.get(
+      `filemap/file?sha256=${sha256}&parentId=${parentId}&filename=${newFile.file_name}&format=${newFile.format}`
+    );
+    newFile.processing = "完成";
+    return "linked";
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      return error.response.data;
+    // 判断错误码是不是404，如果是404，说明文件不存在，可以上传
+    if (axios.isAxiosError(error) && error.response?.status === 400) {
+      const formData = new FormData();
+      formData.append("filename", newFile.file_name);
+      formData.append("format", newFile.format);
+      formData.append("file", newFile.file);
+      formData.append("parentId", parentId.toString());
+      formData.append("sha256", sha256);
+      const response = await axiosInstance.post("filemap/file", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        // 回调，用于更新上传进度
+        onUploadProgress: function (progressEvent) {
+          let percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total!
+          );
+          newFile.processing = percentCompleted;
+        },
+      });
+      return "success";
     }
-    return "Unexpected Error";
-    console.error(`Error occurred while posting file record: ${error}`);
+    return "error";
   }
 }
 
@@ -101,5 +109,22 @@ async function patchFile(fileId: number, newName: string): Promise<boolean> {
   }
 }
 
-export { getFileList, postFolder, postNewFile, deleteFile, patchFile };
+async function calculateFileSHA256(file: File): Promise<string> {
+  const arrayBuffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hashHex;
+}
+
+export {
+  getFileList,
+  postFolder,
+  postNewFile,
+  deleteFile,
+  patchFile,
+  calculateFileSHA256,
+};
 export type { FileMap };
