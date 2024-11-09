@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class TemplateController {
 
+    @GetMapping("/")
+    public String index(Model model) {
+        return "index";
+    }
+
     @GetMapping("/login")
     public String login(Model model) {
         // 初始化User对象并传递到模板

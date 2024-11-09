@@ -33,7 +33,7 @@ public class UserService {
         if (existUser != null) {
             return null;
         }
-        User user = new User(null, username, SaSecureUtil.sha512(password + SALT),null);
+        User user = new User(username, SaSecureUtil.sha512(password + SALT));
         userMapper.insert(user);
         // 为这个用户创建一个Root文件夹
         fileMapService.createRootDir(user);

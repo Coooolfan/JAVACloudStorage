@@ -54,15 +54,12 @@ public class UserController {
         if (userRegistered != null) {
             return new ResponseEntity<>(userRegistered, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>("用户名重复",HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("用户名重复", HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(value = "/info")
     public ResponseEntity<User> getUserInfo() {
-        if(StpUtil.isLogin()){
-            val loginId = StpUtil.getLoginIdAsLong();
-            return ResponseEntity.ok(userService.getUserInfo(loginId));
-        }
-        return new ResponseEntity(null,HttpStatus.UNAUTHORIZED);
+        val loginId = StpUtil.getLoginIdAsLong();
+        return ResponseEntity.ok(userService.getUserInfo(loginId));
     }
 }

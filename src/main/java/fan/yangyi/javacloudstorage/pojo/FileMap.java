@@ -4,17 +4,21 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @TableName("filemap")
+@NoArgsConstructor
 public class FileMap {
 
     @TableId(type = IdType.AUTO)
     private Integer id;
 
+//    单位KB
     private Integer size;
 
     private String filename;
@@ -31,6 +35,10 @@ public class FileMap {
 
     private String filePath;
 
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
+
     public FileMap(String filename, String format, Boolean isDirectory, Integer parent, Integer owner, Boolean isRoot, Integer size) {
         this.filename = filename;
         this.format = format;
@@ -38,7 +46,7 @@ public class FileMap {
         this.parent = parent;
         this.owner = owner;
         this.isRoot = isRoot;
-        this.filename = generateFilePath();
+        this.filePath = generateFilePath();
         this.size = size;
     }
 

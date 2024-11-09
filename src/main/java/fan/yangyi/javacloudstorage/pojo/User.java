@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 
 @Data
 @AllArgsConstructor
@@ -25,4 +28,24 @@ public class User {
     private String password;
 
     private String avatar;
+
+    private Long quota;
+
+    private Long usedQuota;
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+        this.avatar = null;
+        this.quota = 1024*1024L; // 默认 1GB
+        this.createTime = null;
+        this.updateTime = null;
+        this.usedQuota = 0L;
+    }
+
+
 }
