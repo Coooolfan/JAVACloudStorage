@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:9.1.0
+    ports:
+      - "3306:3306"
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: javacloudstorage
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - mysql-config:/etc/mysql/conf.d
+
+volumes:
+  mysql-data:
+    driver: local
+  mysql-config:
+    driver: local
