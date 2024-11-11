@@ -13,12 +13,12 @@
 # 截图
 <table>
     <tr>
-        <td><img src="static/image.png" alt="登录"></td>
-        <td><img src="static/image-1.png" alt="注册"></td>
+        <td><img src="static/1.png" alt="登录"></td>
+        <td><img src="static/2.jpg.png" alt="注册"></td>
     </tr>
     <tr>
-        <td><img src="static/image-2.png" alt="主页面"></td>
-        <td><img src="static/image-3.png" alt="新建立文件夹弹窗"></td>
+        <td><img src="static/3.png" alt="主页面"></td>
+        <td><img src="static/4.png" alt="新建立文件夹弹窗"></td>
     </tr>
 </table>
 
